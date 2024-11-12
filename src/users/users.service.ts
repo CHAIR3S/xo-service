@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Role } from 'src/role/entities/role.entity';
-import * as bcrypt from 'bcrypt';
 import { createCipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
 
@@ -43,6 +42,10 @@ export class UsersService {
 
   findOne(id: number) {
     return this.userRepository.findOneBy({id});
+  }
+
+  findOneByEmail(email: string){
+    return this.userRepository.findOneBy({email});
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {

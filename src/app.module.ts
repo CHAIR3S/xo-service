@@ -9,6 +9,8 @@ import { UsersModule } from './users/users.module';
 import { EventModule } from './event/event.module';
 import { TicketModule } from './ticket/ticket.module';
 import { HelperModule } from './helper/helper.module';
+import { EventPhotoModule } from './event-photo/event-photo.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -30,7 +32,9 @@ import { HelperModule } from './helper/helper.module';
     UsersModule,
     EventModule,
     TicketModule,
-    HelperModule
+    HelperModule,
+    EventPhotoModule,
+    AuthModule
   ],
   controllers: [],
   providers: [AppService],
