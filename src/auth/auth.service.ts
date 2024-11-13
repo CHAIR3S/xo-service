@@ -18,43 +18,41 @@ export class AuthService {
     }
 
     async signIn({email, password}): Promise<{ access_token: string }> {
-
         const user = await this.userService.findOneByEmail(email);
+    
+        if (!user) throw new UnauthorizedException('Password or Email are incorrect');
+        
+        this.logger.log('Usuario encontrado por email')
 
-        if(!user)
-            throw new UnauthorizedException('Password or Email are incorrect');
-
-        // let isMatch = false;
         const isMatch = await this.match(user.password, password);
+    
+        if (!isMatch) throw new UnauthorizedException('Password or Email are incorrect');
+    
+        this.logger.log('Sesion iniciada correctamente')
 
-        if(!isMatch)
-            throw new UnauthorizedException('Password or Email are incorrect');
-
-        const payload = { sub: user.id, username: user.username, name: user.name, verify: user.isVerified};
-
+        const payload = { sub: user.id, username: user.username, name: user.name, verify: user.isVerified };
+    
         return {
-        access_token: await this.jwtService.signAsync(payload),
+          access_token: await this.jwtService.signAsync(payload),
         };
     }
 
 
-    async match(encrypted, unencrypted){
-        const iv = randomBytes(16);
+    async match(storedPassword: string, suppliedPassword: string) {
+        const [ivHex, encryptedPassword] = storedPassword.split(':');
+        const iv = Buffer.from(ivHex, 'hex');
+        const encryptedBuffer = Buffer.from(encryptedPassword, 'hex');
         const secret = 'c832di0xie9jc90';
         const key = (await promisify(scrypt)(secret, 'salt', 32)) as Buffer;
-        // const cipher = createCipheriv('aes-256-ctr', key, iv);
-
+    
         const decipher = createDecipheriv('aes-256-ctr', key, iv);
-
+    
         const decryptedText = Buffer.concat([
-            decipher.update(encrypted),
-            decipher.final(),
+          decipher.update(encryptedBuffer),
+          decipher.final(),
         ]);
-
-
-        this.logger.log(decryptedText.toString())
-
-        return (decryptedText.toString() == unencrypted);
+    
+        return decryptedText.toString() === suppliedPassword;
     }
 
 }

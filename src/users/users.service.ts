@@ -30,7 +30,9 @@ export class UsersService {
     user.verificationCode = createUserDto.verificationCode;
     user.isVerified = createUserDto.isVerified;
 
-    user.password = await this.encrypt(user.password);
+    
+    const { encryptedText, iv } = await this.encrypt(createUserDto.password);
+    user.password = `${iv.toString('hex')}:${encryptedText}`;
 
   
     return this.userRepository.save(user);
@@ -55,7 +57,11 @@ export class UsersService {
     userById.name = updateUserDto.name;
     userById.username = updateUserDto.username;
     userById.email = updateUserDto.email;
-    userById.password = await this.encrypt(updateUserDto.password);
+    
+
+    const { encryptedText, iv } = await this.encrypt(updateUserDto.password);
+    userById.password = `${iv.toString('hex')}:${encryptedText}`;
+
     userById.profilePicture = updateUserDto.profilePicture;
     role.id = updateUserDto.roleId;
     userById.role = role;
@@ -71,22 +77,16 @@ export class UsersService {
 
 
   async encrypt(password: string){
-
     const iv = randomBytes(16);
     const secret = 'c832di0xie9jc90';
-
-    // The key length is dependent on the algorithm.
-    // In this case for aes256, it is 32 bytes.
     const key = (await promisify(scrypt)(secret, 'salt', 32)) as Buffer;
     const cipher = createCipheriv('aes-256-ctr', key, iv);
 
-    const textToEncrypt = password;
     const encryptedText = Buffer.concat([
-      cipher.update(textToEncrypt),
+      cipher.update(password),
       cipher.final(),
     ]);
-    
 
-    return encryptedText.toString('hex');
+    return { encryptedText: encryptedText.toString('hex'), iv };
   }
 }
