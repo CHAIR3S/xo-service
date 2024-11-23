@@ -1,6 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CredentialDTO } from './dto/credential-dto';
+import { Public } from 'src/decorator/public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -9,6 +10,7 @@ export class AuthController {
         private authService: AuthService
     ){}
 
+    @Public()
     @Post('/login')
     login(@Body() credentialDto: CredentialDTO){
         return this.authService.signIn(credentialDto);

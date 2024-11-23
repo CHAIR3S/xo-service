@@ -7,10 +7,10 @@ import { UpdateTicketStatusDto } from './dto/update-ticket-status.dto';
 export class TicketStatusController {
   constructor(private readonly ticketStatusService: TicketStatusService) {}
 
-  @Post()
-  create(@Body() createTicketStatusDto: CreateTicketStatusDto) {
-    return this.ticketStatusService.create(createTicketStatusDto);
-  }
+  // @Post()
+  // create(@Body() createTicketStatusDto: CreateTicketStatusDto) {
+  //   return this.ticketStatusService.create(createTicketStatusDto);
+  // }
 
   @Get()
   findAll() {
@@ -22,13 +22,13 @@ export class TicketStatusController {
     return this.ticketStatusService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTicketStatusDto: UpdateTicketStatusDto) {
-    return this.ticketStatusService.update(+id, updateTicketStatusDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateTicketStatusDto: UpdateTicketStatusDto) {
+  //   return this.ticketStatusService.update(+id, updateTicketStatusDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ticketStatusService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.ticketStatusService.remove(+id);
+  // }
 }

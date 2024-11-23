@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { TicketService } from './ticket.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { Roles } from 'src/decorator/role.decorator';
+import { Role } from 'src/enum/role.enum';
 
 @Controller('ticket')
 export class TicketController {
@@ -12,6 +14,8 @@ export class TicketController {
     return this.ticketService.create(createTicketDto);
   }
 
+  
+  @Roles(Role.ADMIN)
   @Get()
   findAll() {
     return this.ticketService.findAll();

@@ -7,10 +7,10 @@ import { UpdateHelperPermissionDto } from './dto/update-helper-permission.dto';
 export class HelperPermissionController {
   constructor(private readonly helperPermissionService: HelperPermissionService) {}
 
-  @Post()
-  create(@Body() createHelperPermissionDto: CreateHelperPermissionDto) {
-    return this.helperPermissionService.create(createHelperPermissionDto);
-  }
+  // @Post()
+  // create(@Body() createHelperPermissionDto: CreateHelperPermissionDto) {
+  //   return this.helperPermissionService.create(createHelperPermissionDto);
+  // }
 
   @Get()
   findAll() {
@@ -26,13 +26,13 @@ export class HelperPermissionController {
     return permission;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateHelperPermissionDto: UpdateHelperPermissionDto) {
-    return this.helperPermissionService.update(+id, updateHelperPermissionDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateHelperPermissionDto: UpdateHelperPermissionDto) {
+  //   return this.helperPermissionService.update(+id, updateHelperPermissionDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.helperPermissionService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.helperPermissionService.remove(+id);
+  // }
 }

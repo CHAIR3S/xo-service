@@ -17,8 +17,6 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
   
-  @UseGuards(AuthGuard)
-  @Roles(Role.ADMIN)
   @Get()
   findAll() {
     return this.usersService.findAll();

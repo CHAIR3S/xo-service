@@ -7,10 +7,10 @@ import { UpdateEventVisibilityDto } from './dto/update-event-visibility.dto';
 export class EventVisibilityController {
   constructor(private readonly eventVisibilityService: EventVisibilityService) {}
 
-  @Post()
-  create(@Body() createEventVisibilityDto: CreateEventVisibilityDto) {
-    return this.eventVisibilityService.create(createEventVisibilityDto);
-  }
+  // @Post()
+  // create(@Body() createEventVisibilityDto: CreateEventVisibilityDto) {
+  //   return this.eventVisibilityService.create(createEventVisibilityDto);
+  // }
 
   @Get()
   findAll() {
@@ -27,13 +27,13 @@ export class EventVisibilityController {
     return visibility
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEventVisibilityDto: UpdateEventVisibilityDto) {
-    return this.eventVisibilityService.update(+id, updateEventVisibilityDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateEventVisibilityDto: UpdateEventVisibilityDto) {
+  //   return this.eventVisibilityService.update(+id, updateEventVisibilityDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.eventVisibilityService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.eventVisibilityService.remove(+id);
+  // }
 }

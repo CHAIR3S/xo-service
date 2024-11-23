@@ -1,16 +1,21 @@
-
-import { Injectable, CanActivate, ExecutionContext, Logger } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, Logger, NotFoundException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from 'src/decorator/role.decorator';
 import { Role } from 'src/enum/role.enum';
+import { UsersService } from '../users/users.service';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(
+    private reflector: Reflector,
+    private usersService: UsersService, 
+  ) {}
 
+  
   private readonly logger = new Logger(RolesGuard.name);
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -18,17 +23,24 @@ export class RolesGuard implements CanActivate {
     if (!requiredRoles) {
       return true;
     }
+    const { user } = context.switchToHttp().getRequest();
 
-    const request = context.switchToHttp().getRequest();
-    const user = request['user'];
+    if(user){
 
-    // this.logger.log(context.switchToHttp().getRequest())
-    this.logger.log(JSON.parse(user))
-    this.logger.log('HOLAAAAAAA')
+      this.logger.log('Find roles by user {}:', user.sub)
 
-    // return requiredRoles.some((role) => user.role?.name.includes(role));
+      const userById: User = await this.usersService.findOne(user.sub);
+
+      this.logger.log('ROLE GUARD >>>>');
+      // this.logger.log(userById);
+  
+      return requiredRoles.some((role) => userById.role.name?.includes(role));
+    }
+
+    if(!user){
+      throw new NotFoundException('User does not exist');
+    }
+    
+    return false;
   }
 }
-
-
-
