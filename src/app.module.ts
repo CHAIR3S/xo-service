@@ -21,12 +21,12 @@ import { SeedModule } from 'seeds/seed.module';
     RoleModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'Luischaip12',
-      database: 'postgres',
-      schema: 'xo',
+      host: 'ep-polished-mountain-a5tprlko.us-east-2.aws.neon.tech',
+      // port: 5432,
+      username: 'neondb_owner',
+      password: 'IYEfxF3SR6JO',
+      database: 'neondb',
+      ssl: true,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true
     }),

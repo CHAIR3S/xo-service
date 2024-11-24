@@ -11,7 +11,7 @@ async function bootstrap() {
 
   
   const config = new DocumentBuilder()
-    .setTitle('Cats example')
+    .setTitle('XO example')
     .setDescription('XO application documentation')
     .setVersion('1.0')
     .addTag('Tickets')
