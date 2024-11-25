@@ -14,7 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/auth.guard';
 import { RolesGuard } from './role/role.guard';
-import { SeedModule } from 'seeds/seed.module';
+import { SeedModule } from 'src/seeds/seed.module';
 
 @Module({
   imports: [

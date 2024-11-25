@@ -1,7 +1,7 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HelperPermission } from 'src/helper-permission/entities/helper-permission.entity';
-import { Role } from 'src/role/entities/role.entity';
+import { Role } from 'src/role/entities/role.entity'; 
 import { TicketStatus } from 'src/ticket-status/entities/ticket-status.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
