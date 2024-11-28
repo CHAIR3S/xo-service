@@ -1,4 +1,4 @@
-import { IsBoolean, IsDateString, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsBoolean, IsDateString, IsInt, isNotEmpty, IsNotEmpty, IsNumber, IsOptional, isString, IsString, MaxLength } from 'class-validator';
 
 export class CreateEventDto {
 
@@ -6,6 +6,9 @@ export class CreateEventDto {
     @IsString()
     @MaxLength(255)
     name: string;
+
+    @IsNotEmpty()
+    creatorId: number;
 
     @IsOptional()
     @IsString()
@@ -42,7 +45,12 @@ export class CreateEventDto {
     theme: string;
 
     @IsOptional()
-    cover: Buffer;
+    cover: string;
+
+    @IsOptional()
+    @IsString()
+    @MaxLength(30)
+    imageFormat: string;
 
     @IsOptional()
     @IsNumber({ maxDecimalPlaces: 2 })

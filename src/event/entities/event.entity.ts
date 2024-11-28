@@ -43,6 +43,9 @@ export class Event {
     @Column({ type: 'bytea', nullable: true })
     cover: Buffer;
 
+    @Column({ type: 'varchar', name: 'image_format', length: 30, nullable: true})
+    imageFormat: string
+
     @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true, name: 'ticket_price' })
     ticketPrice: number;
 
