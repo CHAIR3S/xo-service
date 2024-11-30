@@ -13,14 +13,14 @@ export class Ticket {
     @JoinColumn({ name: 'event_id' })
     event: Event;
 
-    @ManyToOne(() => User, user => user.id)
-    @JoinColumn({ name: 'user_id' })
+    @ManyToOne(() => User, user => user.id, {nullable: true})
+    @JoinColumn({ name: 'user_id'})
     user: User;
 
-    @Column({ type: 'varchar', length: 10 })
+    @Column({ type: 'varchar', length: 10, nullable: true })
     code: string;
 
-    @ManyToOne(() => TicketStatus, status => status.id)
+    @ManyToOne(() => TicketStatus, status => status.id, {nullable: true})
     @JoinColumn({ name: 'status_id' })
     status: TicketStatus;
 

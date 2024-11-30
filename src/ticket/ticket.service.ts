@@ -7,6 +7,7 @@ import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { Event } from 'src/event/entities/event.entity';
 import { TicketStatus } from 'src/ticket-status/entities/ticket-status.entity';
 import { User } from 'src/users/entities/user.entity';
+import { generateUniqueLengthCodeForEvent } from 'src/utils/id.generator.utils';
 
 @Injectable()
 export class TicketService {
@@ -20,7 +21,6 @@ export class TicketService {
 
   async create(createTicketDto: CreateTicketDto) {
     const ticket = new Ticket();
-    ticket.code = createTicketDto.code;
 
     ticket.event = await this.eventRepository.findOneBy({ id: createTicketDto.eventId });
     if (!ticket.event) {
@@ -39,11 +39,53 @@ export class TicketService {
       }
     }
 
+    ticket.code = await generateUniqueLengthCodeForEvent(createTicketDto.eventId, this.ticketRepository, 5);
     return this.ticketRepository.save(ticket);
   }
 
+
+  async createAll(createTicketDto: CreateTicketDto, amount: number) {
+    const tickets: Ticket[] = [];
+    const generatedCodes = new Set<string>(); // Usamos un conjunto para almacenar códigos únicos
+  
+    for (let i = 0; i < amount; i++) {
+      const ticket = new Ticket();
+      ticket.event = new Event();
+      ticket.event.id = createTicketDto.eventId;
+      ticket.status = new TicketStatus();
+      ticket.status.id = 1; // Status CREATED
+  
+      let uniqueCode: string;
+      do {
+        // Generar un código único para el evento
+        uniqueCode = await generateUniqueLengthCodeForEvent(
+          createTicketDto.eventId,
+          this.ticketRepository,
+          5,
+        );
+      } while (generatedCodes.has(uniqueCode)); // Verificar que no esté en el conjunto local
+  
+      // Agregar el código único al conjunto
+      generatedCodes.add(uniqueCode);
+  
+      ticket.code = uniqueCode; // Asignar el código al ticket
+      tickets.push(ticket);
+    }
+  
+    return this.ticketRepository.save(tickets);
+  }
+  
+
+
   findAll() {
-    return this.ticketRepository.find({ relations: ['event', 'user', 'status'] });
+    return this.ticketRepository.find({ relations: ['user', 'status'] });
+  }
+
+  findAllByEventId(eventId: string) {
+    return this.ticketRepository.find({
+      where: { event: { id: eventId } },
+      relations: ['status', 'user'],
+    });
   }
 
   async findOne(id: number) {
