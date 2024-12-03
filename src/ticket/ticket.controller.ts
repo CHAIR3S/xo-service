@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Logger } from '@nestjs/common';
 import { TicketService } from './ticket.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
@@ -9,6 +9,9 @@ import { Ticket } from './entities/ticket.entity';
 @Controller('ticket')
 export class TicketController {
   constructor(private readonly ticketService: TicketService) {}
+
+  private readonly logger = new Logger('-- ' + TicketController.name + ' --');
+
 
   @Roles(Role.ADMIN, Role.CREATOR)
   @Post()
@@ -34,6 +37,15 @@ export class TicketController {
     return this.ticketService.findOne(+id);
   }
 
+
+  @Patch('code')
+  updateByCode(@Body() updateTicketDto: UpdateTicketDto) {
+    // this.logger.log(updateTicketDto)
+    return this.ticketService.updateByCode(updateTicketDto);
+  }
+
+
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTicketDto: UpdateTicketDto) {
     return this.ticketService.update(+id, updateTicketDto);
@@ -44,9 +56,13 @@ export class TicketController {
     return this.ticketService.remove(+id);
   }
 
-  @Roles(Role.ADMIN, Role.CREATOR)
-  @Get('event/:eventId')
-  async getAllByEventId(@Param('eventId') eventId: string): Promise<Ticket[]> {
-    return this.ticketService.findAllByEventId(eventId);
-  }
+  // @Roles(Role.ADMIN, Role.CREATOR)
+  // @Get('event/:eventId')
+  // async getAllByEventId(@Param('eventId') eventId: string): Promise<Ticket[]> {
+  //   // return this.ticketService.findAllByEventId(eventId);
+  // }
+
+  
+
+
 }

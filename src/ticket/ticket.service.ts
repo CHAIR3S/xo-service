@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Ticket } from './entities/ticket.entity';
@@ -11,6 +11,9 @@ import { generateUniqueLengthCodeForEvent } from 'src/utils/id.generator.utils';
 
 @Injectable()
 export class TicketService {
+
+  private readonly logger = new Logger('-- ' + TicketService.name + ' --');
+
 
   constructor(
     @InjectRepository(Ticket) private ticketRepository: Repository<Ticket>,
@@ -97,7 +100,7 @@ export class TicketService {
   }
 
   async update(id: number, updateTicketDto: UpdateTicketDto) {
-    const ticket = await this.findOne(id);
+    const ticket = await this.ticketRepository.findOneBy({id});
 
     ticket.code = updateTicketDto.code ?? ticket.code;
 
@@ -126,7 +129,43 @@ export class TicketService {
   }
 
   async remove(id: number) {
-    const ticket = await this.findOne(id);
-    return this.ticketRepository.remove(ticket);
+    const ticket = await this.ticketRepository.findOneBy({id});
+    return this.ticketRepository.delete(ticket);
+  }
+
+  getByUserId(userId: number, eventId: string){
+    
+    return this.ticketRepository.findOne({
+      where: {
+        event: { id: eventId },
+        user: { id: userId },
+      },
+      relations: ['event', 'user'],
+    });
+
+  }
+
+  async updateByCode(ticket: UpdateTicketDto){
+
+    this.logger.log(ticket);
+
+
+    const find = await this.ticketRepository.findOne({
+      where: {
+        event: {id: ticket.eventId},
+        code: ticket.code,
+    },
+      relations: ['user']
+      
+    })
+
+    this.logger.log(find);
+    find.user = new User();
+    find.user.id = ticket.userId;
+    find.status = new TicketStatus();
+    find.status.id = ticket.statusId; 
+    
+
+    return this.ticketRepository.save(find);
   }
 }

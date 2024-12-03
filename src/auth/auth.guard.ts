@@ -11,6 +11,7 @@ import { jwtConstants } from './constants';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from 'src/decorator/public.decorator';
 import { Reflector } from '@nestjs/core';
+import { log } from 'console';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -47,7 +48,9 @@ export class AuthGuard implements CanActivate {
 
       request['user'] = payload;
       
-    } catch {
+    } catch(e) {
+      this.logger.log(token)
+      this.logger.error(e)
       this.logger.error('Not Authorized');
       throw new UnauthorizedException();
     }

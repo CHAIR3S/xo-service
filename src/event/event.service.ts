@@ -7,6 +7,8 @@ import { Event } from './entities/event.entity';
 import { generateUniqueAlphanumericId } from 'src/utils/id.generator.utils';
 import { User } from 'src/users/entities/user.entity';
 import { lookup } from 'mime-types';
+import { EventUser } from 'src/enum/event-user.enum';
+import { Ticket } from 'src/ticket/entities/ticket.entity';
 
 @Injectable()
 export class EventService {
@@ -15,6 +17,7 @@ export class EventService {
 
   constructor(
     @InjectRepository(Event) private eventRepository: Repository<Event>,
+    @InjectRepository(Ticket) private ticketRepository: Repository<Ticket>,
   ) {}
 
   async create(createEventDto: CreateEventDto) {
@@ -66,6 +69,7 @@ export class EventService {
     if (event.cover) {
       event.cover = Buffer.from(event.cover).toString('base64');
     }
+    
 
     return event;
   }
@@ -97,4 +101,32 @@ export class EventService {
   remove(id: string) {
     return this.eventRepository.delete({ id });
   }
+
+
+  async getRelationUser(userId: number, id: string){
+    const event = await this.eventRepository.findOne({where: {id: id}, relations: ['creator']});
+
+    this.logger.log(event);
+    this.logger.log(userId)
+    this.logger.log(event.creator);
+
+    if(event.creator.id == userId){
+      return EventUser.CREATOR.toString();
+    }
+
+    const ticket = await this.ticketRepository.findOne({
+      where: {
+        event: { id: id },
+        user: { id: userId },
+      },
+      relations: ['event', 'user'],
+    })
+
+    if(ticket){
+      return EventUser.REGISTER.toString();
+    }
+
+    return EventUser.UNREGISTER.toString();
+  }
+
 }

@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { createDecipheriv, randomBytes, scrypt, verify } from 'crypto';
 import { promisify } from 'util';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,7 @@ export class AuthService {
     ) {
     }
 
-    async signIn({email, password}): Promise<{ access_token: string }> {
+    async signIn({email, password}): Promise<{ access_token: string, user:User }> {
         const user = await this.userService.findOneByEmail(email);
     
         if (!user) throw new UnauthorizedException('Password or Email are incorrect');
@@ -34,6 +35,7 @@ export class AuthService {
     
         return {
           access_token: await this.jwtService.signAsync(payload),
+          user: user
         };
     }
 

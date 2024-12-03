@@ -50,7 +50,7 @@ export class UsersService {
   }
 
   findOneByEmail(email: string){
-    return this.userRepository.findOneBy({email});
+    return this.userRepository.findOne({ where: { email }, relations: ['role'] });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {

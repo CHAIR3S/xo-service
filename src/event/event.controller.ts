@@ -18,8 +18,14 @@ export class EventController {
 
   @Public()
   @Get()
-  findAll() {
+  findAll(){
     return this.eventService.findAll();
+  }
+
+  @Roles(Role.ADMIN, Role.CREATOR, Role.USER)
+  @Post('event-user')
+  findUserRelation(@Body() { userId, eventId }: { userId: number; eventId: string }) {
+    return this.eventService.getRelationUser(userId, eventId);
   }
 
   @Public()
