@@ -28,6 +28,29 @@ export class EventController {
     return this.eventService.getRelationUser(userId, eventId);
   }
 
+
+  @Get('creator/:creatorId/past')
+  getPastEventsByCreator(@Param('creatorId') creatorId: number) {
+    return this.eventService.getPastEventsByCreator(creatorId);
+  }
+
+  @Get('creator/:creatorId/future')
+  getFutureEventsByCreator(@Param('creatorId') creatorId: number) {
+    return this.eventService.getFutureEventsByCreator(creatorId);
+  }
+
+  @Get('user/:userId/registered/past')
+  getPastRegisteredEvents(@Param('userId') userId: number) {
+    return this.eventService.getPastRegisteredEvents(userId);
+  }
+
+  @Get('user/:userId/registered/future')
+  getFutureRegisteredEvents(@Param('userId') userId: number) {
+    return this.eventService.getFutureRegisteredEvents(userId);
+  }
+
+
+
   @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {

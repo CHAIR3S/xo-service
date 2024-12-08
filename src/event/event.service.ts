@@ -129,4 +129,95 @@ export class EventService {
     return EventUser.UNREGISTER.toString();
   }
 
+
+
+
+
+  async getPastEventsByCreator(creatorId: number) {
+    const events: any[] = await this.eventRepository.createQueryBuilder('event')
+      .where('event.creator_id = :creatorId', { creatorId })
+      .andWhere("(event.date || ' ' || event.start_time)::timestamp < NOW()")
+      .getMany();
+  
+    if (!Array.isArray(events)) {
+      this.logger.error(`getPastEventsByCreator: Expected an array but got: ${typeof events}`, events);
+      return [];
+    }
+  
+    return Promise.all(
+      events.map(async (event) => {
+        if (event.cover) {
+          event.cover = event.cover.toString('base64');
+        }
+        return event;
+      }),
+    );
+  }
+  
+  async getFutureEventsByCreator(creatorId: number) {
+    const events: any[] = await this.eventRepository.createQueryBuilder('event')
+      .where('event.creator_id = :creatorId', { creatorId })
+      .andWhere("(event.date || ' ' || event.start_time)::timestamp > NOW()")
+      .getMany();
+  
+    if (!Array.isArray(events)) {
+      this.logger.error(`getFutureEventsByCreator: Expected an array but got: ${typeof events}`, events);
+      return [];
+    }
+  
+    return Promise.all(
+      events.map(async (event) => {
+        if (event.cover) {
+          event.cover = event.cover.toString('base64');
+        }
+        return event;
+      }),
+    );
+  }
+  
+  async getPastRegisteredEvents(userId: number) {
+    const events: any[] = await this.eventRepository.createQueryBuilder('event')
+      .leftJoin('event.tickets', 'ticket')
+      .where('ticket.user_id = :userId', { userId })
+      .andWhere("(event.date || ' ' || event.start_time)::timestamp < NOW()")
+      .getMany();
+  
+    if (!Array.isArray(events)) {
+      this.logger.error(`getPastRegisteredEvents: Expected an array but got: ${typeof events}`, events);
+      return [];
+    }
+  
+    return Promise.all(
+      events.map(async (event) => {
+        if (event.cover) {
+          event.cover = event.cover.toString('base64');
+        }
+        return event;
+      }),
+    );
+  }
+  
+  async getFutureRegisteredEvents(userId: number) {
+    const events: any[] = await this.eventRepository.createQueryBuilder('event')
+      .leftJoin('event.tickets', 'ticket')
+      .where('ticket.user_id = :userId', { userId })
+      .andWhere("(event.date || ' ' || event.start_time)::timestamp > NOW()")
+      .getMany();
+  
+    if (!Array.isArray(events)) {
+      this.logger.error(`getFutureRegisteredEvents: Expected an array but got: ${typeof events}`, events);
+      return [];
+    }
+  
+    return Promise.all(
+      events.map(async (event) => {
+        if (event.cover) {
+          event.cover = event.cover.toString('base64');
+        }
+        return event;
+      }),
+    );
+  }
+  
+
 }
