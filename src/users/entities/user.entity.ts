@@ -30,7 +30,10 @@ export class User {
   
     @Column({ type: 'boolean', default: false , name: 'is_verified'})
     isVerified: boolean;
-  
+
+    @Column({type: 'varchar', length: 30, nullable: true, name: 'image_format'})
+    imageFormat: string;
+
     @CreateDateColumn({ type: 'timestamp' , name: 'created_at'})
     createdAt: Date;
   

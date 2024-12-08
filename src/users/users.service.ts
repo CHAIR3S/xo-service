@@ -7,12 +7,21 @@ import { User } from './entities/user.entity';
 import { Role } from 'src/role/entities/role.entity';
 import { createCipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
+import { Role as RoleEnum } from 'src/enum/role.enum';
+import { Event } from 'src/event/entities/event.entity';
+
+export interface Metrics  {
+  attendees: number,
+  events: number,
+  pictures: number
+}
 
 @Injectable()
 export class UsersService {
 
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>
+    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Event) private _eventRepository: Repository<Event>
   ){
 
   }
@@ -24,6 +33,7 @@ export class UsersService {
     user.username = createUserDto.username;
     user.email = createUserDto.email;
     // user.password = createUserDto.password;
+    user.imageFormat = createUserDto.imageFormat;
     user.profilePicture = createUserDto.profilePicture;
     role.id = createUserDto.roleId;
     user.role = role;
@@ -38,8 +48,15 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
-  findAll() {
-    return this.userRepository.find();
+  async findAll() {
+    const find = await this.userRepository.find();
+    
+    return find.map( user => {
+      if(user){
+        user.password = ''
+      }
+      return user;
+    }) 
   }
 
   findOne(id: number) {
@@ -65,6 +82,7 @@ export class UsersService {
     const { encryptedText, iv } = await this.encrypt(updateUserDto.password);
     userById.password = `${iv.toString('hex')}:${encryptedText}`;
 
+    userById.imageFormat = updateUserDto.imageFormat;
     userById.profilePicture = updateUserDto.profilePicture;
     role.id = updateUserDto.roleId;
     userById.role = role;
@@ -76,6 +94,53 @@ export class UsersService {
 
   remove(id: number) {
     return this.userRepository.delete({id})
+  }
+
+  async findByUsername(username: string) {
+    const user = await this.userRepository.findOne({
+      where: { username: username },
+      relations: ['role']
+    });
+
+    if(user){
+      user.password = '';
+
+      if(user.role.name == RoleEnum.CREATOR || user.role.name == RoleEnum.ADMIN ){
+        const creatorId = user.id
+
+        
+        const attendees = await this._eventRepository
+          .createQueryBuilder('event')
+          .leftJoinAndSelect('event.tickets', 'ticket')
+          .where('event.creator_id = :creatorId', { creatorId: user.id })
+          .andWhere('ticket.status_id = :statusId', { statusId: 2 })
+          .getCount();
+
+        const events = await this._eventRepository.count({
+          where: { creator: { id: user.id } },
+        });
+
+        const { total_photos } = await this._eventRepository
+        .createQueryBuilder('event')
+        .select('COUNT(photo.id)', 'total_photos') 
+        .leftJoin('event.photos', 'photo')
+        .where('event.creator_id = :creatorId', { creatorId: user.id })
+        .getRawOne(); 
+      
+        const photos = Number(total_photos);
+      
+
+        const metrics: Metrics = {
+          attendees: attendees,
+          events: events,
+          pictures: photos
+        }
+
+        return {user, metrics}
+      }
+    
+      return user;
+    }
   }
 
 

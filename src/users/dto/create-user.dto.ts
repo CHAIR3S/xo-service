@@ -42,6 +42,11 @@ export class CreateUserDto {
     @IsString()
     @MaxLength(6)
     verificationCode?: string;
+
+    @IsString()
+    @MaxLength(30)
+    @IsOptional()
+    imageFormat?: string;
   
     @ApiProperty({ example: true, required: false })
     @IsOptional()

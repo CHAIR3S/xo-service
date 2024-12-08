@@ -1,6 +1,8 @@
+import { EventPhoto } from "src/event-photo/entities/event-photo.entity";
 import { EventVisibility } from "src/event-visibility/entities/event-visibility.entity";
+import { Ticket } from "src/ticket/entities/ticket.entity";
 import { User } from "src/users/entities/user.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('event')
 export class Event {
@@ -63,4 +65,10 @@ export class Event {
 
     @UpdateDateColumn({ type: 'timestamp', name: 'updated_at' })
     updatedAt: Date;
+
+    @OneToMany(() => Ticket, (ticket) => ticket.event)
+    tickets: Ticket[];
+
+    @OneToMany(() => EventPhoto, (eventPhoto) => eventPhoto.event)
+    photos: EventPhoto[];
 }
