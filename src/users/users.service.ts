@@ -102,6 +102,13 @@ export class UsersService {
       relations: ['role']
     });
 
+    
+    let metrics: Metrics = {
+      attendees: null,
+      events: null,
+      pictures: null
+    }
+
     if(user){
       user.password = '';
 
@@ -130,7 +137,7 @@ export class UsersService {
         const photos = Number(total_photos);
       
 
-        const metrics: Metrics = {
+        metrics = {
           attendees: attendees,
           events: events,
           pictures: photos
@@ -139,7 +146,7 @@ export class UsersService {
         return {user, metrics}
       }
     
-      return user;
+      return {user, metrics};
     }
   }
 
@@ -157,4 +164,25 @@ export class UsersService {
 
     return { encryptedText: encryptedText.toString('hex'), iv };
   }
+
+
+
+  async updateUserRoleTo3(userId: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['role'],
+    });
+  
+    if (!user) {
+      throw new Error(`User with ID ${userId} not found`);
+    }
+  
+    const newRole = new Role();
+    newRole.id = 3; 
+  
+    user.role = newRole;
+  
+    return await this.userRepository.save(user);
+  }
+  
 }

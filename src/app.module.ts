@@ -21,14 +21,12 @@ import { SeedModule } from 'src/seeds/seed.module';
     RoleModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'ep-polished-mountain-a5tprlko.us-east-2.aws.neon.tech',
-      // port: 5432,
-      username: 'neondb_owner',
-      password: 'IYEfxF3SR6JO',
-      database: 'neondb',
-      ssl: true,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true
+      url: 'postgresql://postgres:TSkabUlFpQxBEngQMuMyvgUjAwZsRXbb@junction.proxy.rlwy.net:42144/railway',
+      ssl: {
+        rejectUnauthorized: false, 
+      },
+      entities: [__dirname + '/**/*.entity{.ts,.js}'], 
+      synchronize: true, 
     }),
     EventVisibilityModule,
     TicketStatusModule,

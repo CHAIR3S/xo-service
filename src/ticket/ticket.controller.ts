@@ -5,6 +5,7 @@ import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { Roles } from 'src/decorator/role.decorator';
 import { Role } from 'src/enum/role.enum';
 import { Ticket } from './entities/ticket.entity';
+import { Public } from 'src/decorator/public.decorator';
 
 @Controller('ticket')
 export class TicketController {
@@ -19,7 +20,7 @@ export class TicketController {
     return this.ticketService.create(createTicketDto);
   }
 
-  @Roles(Role.ADMIN, Role.CREATOR)
+  @Roles(Role.ADMIN, Role.CREATOR, Role.USER)
   @Post('event/:amount')
   createByEvent(@Param('amount') amount: number, @Body() createTicketDto: CreateTicketDto) {
     return this.ticketService.createAll(createTicketDto, amount);
@@ -30,6 +31,19 @@ export class TicketController {
   @Get()
   findAll() {
     return this.ticketService.findAll();
+  }
+
+  @Public()
+  @Post('user')
+  async getByUserId(@Body() {userId, eventId}) {
+    return this.ticketService.getByUserId(userId, eventId);
+  }
+
+
+  @Roles(Role.ADMIN, Role.CREATOR)
+  @Get('event/:eventId')
+  async getAllByEventId(@Param('eventId') eventId: string) {
+    return this.ticketService.findAllByEventId(eventId);
   }
 
   @Get(':id')
@@ -56,11 +70,7 @@ export class TicketController {
     return this.ticketService.remove(+id);
   }
 
-  // @Roles(Role.ADMIN, Role.CREATOR)
-  // @Get('event/:eventId')
-  // async getAllByEventId(@Param('eventId') eventId: string): Promise<Ticket[]> {
-  //   // return this.ticketService.findAllByEventId(eventId);
-  // }
+
 
   
 

@@ -10,7 +10,8 @@ import { Role } from 'src/enum/role.enum';
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
-  @Roles(Role.ADMIN, Role.CREATOR)
+  // @Roles(Role.ADMIN, Role.CREATOR, Role)
+  @Public()
   @Post()
   create(@Body() createEventDto: CreateEventDto) {
     return this.eventService.create(createEventDto);
@@ -49,6 +50,11 @@ export class EventController {
     return this.eventService.getFutureRegisteredEvents(userId);
   }
 
+  @Public()
+  @Get('stats/:id')
+  findOneStats(@Param('id') id: string) {
+    return this.eventService.findStats(id);
+  }
 
 
   @Public()

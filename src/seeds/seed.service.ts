@@ -5,6 +5,7 @@ import { Role } from 'src/role/entities/role.entity';
 import { TicketStatus } from 'src/ticket-status/entities/ticket-status.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
+import { EventVisibility } from '../event-visibility/entities/event-visibility.entity';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -16,6 +17,8 @@ export class SeedService implements OnApplicationBootstrap {
     private readonly ticketStatusRepository: Repository<TicketStatus>,
     @InjectRepository(HelperPermission)
     private readonly helperPermissionRepository: Repository<HelperPermission>,
+    @InjectRepository(EventVisibility)
+    private readonly eventVisibilityRepository: Repository<EventVisibility>,
   ) {}
 
   async onApplicationBootstrap() {
@@ -52,6 +55,19 @@ export class SeedService implements OnApplicationBootstrap {
         await this.helperPermissionRepository.save(permission);
       }
     }
+
+
+    const eventVisibilities = ['PUBLIC', 'PRIVATE'];
+
+    for (const visibilityName of eventVisibilities) {
+      const visibilityExists = await this.eventVisibilityRepository.findOne({ where: { name: visibilityName } });
+      if (!visibilityExists) {
+        const visibility = this.eventVisibilityRepository.create({ name: visibilityName });
+        await this.eventVisibilityRepository.save(visibility);
+        console.log(`Visibilidad de evento ${visibilityName} creada`);
+      }
+    }
+
 
     const adminEmail = 'admin@xoevent.com';
     const userExists = await this.usersService.findOneByEmail(adminEmail);

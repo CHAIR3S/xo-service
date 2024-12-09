@@ -49,7 +49,7 @@ export class TicketService {
 
   async createAll(createTicketDto: CreateTicketDto, amount: number) {
     const tickets: Ticket[] = [];
-    const generatedCodes = new Set<string>(); // Usamos un conjunto para almacenar códigos únicos
+    const generatedCodes = new Set<string>();
   
     for (let i = 0; i < amount; i++) {
       const ticket = new Ticket();
@@ -60,23 +60,28 @@ export class TicketService {
   
       let uniqueCode: string;
       do {
-        // Generar un código único para el evento
         uniqueCode = await generateUniqueLengthCodeForEvent(
           createTicketDto.eventId,
           this.ticketRepository,
-          5,
+          5
         );
-      } while (generatedCodes.has(uniqueCode)); // Verificar que no esté en el conjunto local
+      } while (generatedCodes.has(uniqueCode));
   
-      // Agregar el código único al conjunto
       generatedCodes.add(uniqueCode);
-  
-      ticket.code = uniqueCode; // Asignar el código al ticket
+      ticket.code = uniqueCode;
       tickets.push(ticket);
     }
   
-    return this.ticketRepository.save(tickets);
+    // Inserciones en lotes
+    const batchSize = 10; // Ajusta según el límite de la base de datos
+    for (let i = 0; i < tickets.length; i += batchSize) {
+      const batch = tickets.slice(i, i + batchSize);
+      await this.ticketRepository.save(batch);
+    }
+  
+    return { success: true, inserted: tickets.length };
   }
+  
   
 
 

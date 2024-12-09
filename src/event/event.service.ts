@@ -61,7 +61,7 @@ export class EventService {
   }
 
   async findOne(id: string) {
-    const event: any = await this.eventRepository.findOne({ where: { id }, relations: ['creator'] });
+    const event: any = await this.eventRepository.findOne({ where: { id }, relations: ['creator', 'visibility'] });
     if (!event) {
       throw new NotFoundException(`Event with ID ${id} not found`);
     }
@@ -72,6 +72,30 @@ export class EventService {
     
 
     return event;
+  }
+
+
+  async findStats(id: string) {
+    const event: any = await this.eventRepository.findOne({ where: { id }, relations: ['creator'] });
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${id} not found`);
+    }
+
+    if (event.cover) {
+      event.cover = Buffer.from(event.cover).toString('base64');
+    }
+    
+    const assistants = await this.ticketRepository
+    .createQueryBuilder('ticket')
+    .innerJoin('ticket.status', 'status') // Unir con la entidad relacionada
+    .where('ticket.event_id = :eventId', { eventId: id })
+    .andWhere('status.id = :statusId', { statusId: 2 })
+    .getCount();
+
+
+
+
+    return {event, assistants};
   }
 
   async update(id: string, updateEventDto: UpdateEventDto) {
