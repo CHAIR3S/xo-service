@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Logger, Put } from '@nestjs/common';
 import { TicketService } from './ticket.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
@@ -14,6 +14,13 @@ export class TicketController {
   private readonly logger = new Logger('-- ' + TicketController.name + ' --');
 
 
+  
+  @Put('code')
+  updateByCode(@Body() updateTicketDto: UpdateTicketDto) {
+    this.logger.log(updateTicketDto)
+    return this.ticketService.updateByCode(updateTicketDto);
+  }
+
   @Roles(Role.ADMIN, Role.CREATOR)
   @Post()
   create(@Body() createTicketDto: CreateTicketDto) {
@@ -26,6 +33,7 @@ export class TicketController {
     return this.ticketService.createAll(createTicketDto, amount);
   }
 
+  
   
   @Roles(Role.ADMIN)
   @Get()
@@ -52,11 +60,6 @@ export class TicketController {
   }
 
 
-  @Patch('code')
-  updateByCode(@Body() updateTicketDto: UpdateTicketDto) {
-    // this.logger.log(updateTicketDto)
-    return this.ticketService.updateByCode(updateTicketDto);
-  }
 
 
 
