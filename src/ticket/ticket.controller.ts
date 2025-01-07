@@ -14,8 +14,8 @@ export class TicketController {
   private readonly logger = new Logger('-- ' + TicketController.name + ' --');
 
 
-  
-  @Put('code')
+  //
+  @Patch('code')
   updateByCode(@Body() updateTicketDto: UpdateTicketDto) {
     this.logger.log(updateTicketDto)
     return this.ticketService.updateByCode(updateTicketDto);

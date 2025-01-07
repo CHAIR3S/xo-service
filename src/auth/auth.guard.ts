@@ -12,6 +12,7 @@ import { Request } from 'express';
 import { IS_PUBLIC_KEY } from 'src/decorator/public.decorator';
 import { Reflector } from '@nestjs/core';
 import { log } from 'console';
+import { config } from 'config';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -24,6 +25,12 @@ export class AuthGuard implements CanActivate {
 
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+
+    if(!config.authEnabled){
+      return true;
+    }
+
+
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
