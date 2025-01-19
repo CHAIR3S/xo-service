@@ -50,6 +50,9 @@ export class TicketService {
   async createAll(createTicketDto: CreateTicketDto, amount: number) {
     const tickets: Ticket[] = [];
     const generatedCodes = new Set<string>();
+
+    this.logger.debug(createTicketDto)
+    this.logger.debug(amount)
   
     for (let i = 0; i < amount; i++) {
       const ticket = new Ticket();
@@ -165,8 +168,6 @@ export class TicketService {
     })
 
     this.logger.log(find);
-    find.user = new User();
-    find.user.id = ticket.userId;
     find.status = new TicketStatus();
     find.status.id = ticket.statusId; 
     

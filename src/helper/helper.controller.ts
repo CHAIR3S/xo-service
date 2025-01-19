@@ -4,6 +4,7 @@ import { CreateHelperDto } from './dto/create-helper.dto';
 import { UpdateHelperDto } from './dto/update-helper.dto';
 import { Roles } from 'src/decorator/role.decorator';
 import { Role } from 'src/enum/role.enum';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('helper')
 export class HelperController {
@@ -11,6 +12,7 @@ export class HelperController {
 
   @Roles(Role.ADMIN, Role.CREATOR)
   @Post()
+  @ApiBody({ type: CreateHelperDto })
   create(@Body() createHelperDto: CreateHelperDto) {
     return this.helperService.create(createHelperDto);
   }
@@ -27,6 +29,7 @@ export class HelperController {
 
   @Roles(Role.ADMIN, Role.CREATOR)
   @Patch(':id')
+  @ApiBody({ type: UpdateHelperDto })
   update(@Param('id') id: string, @Body() updateHelperDto: UpdateHelperDto) {
     return this.helperService.update(+id, updateHelperDto);
   }

@@ -9,6 +9,7 @@ import { User } from 'src/users/entities/user.entity';
 import { lookup } from 'mime-types';
 import { EventUser } from 'src/enum/event-user.enum';
 import { Ticket } from 'src/ticket/entities/ticket.entity';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class EventService {
@@ -18,9 +19,19 @@ export class EventService {
   constructor(
     @InjectRepository(Event) private eventRepository: Repository<Event>,
     @InjectRepository(Ticket) private ticketRepository: Repository<Ticket>,
+    private userService: UsersService
   ) {}
 
   async create(createEventDto: CreateEventDto) {
+
+    this.logger.debug(createEventDto)
+
+    this.logger.debug('Actualizando rol de usuario')
+
+    await this.userService.updateUserRoleTo3(createEventDto.creatorId);
+
+    this.logger.debug('Usuario actualizado a rol creador')
+
     const event = new Event();
     event.id = await generateUniqueAlphanumericId(this.eventRepository, 'id');
     event.creator = new User();

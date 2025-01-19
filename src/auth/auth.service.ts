@@ -31,7 +31,7 @@ export class AuthService {
     
         this.logger.log('Sesion iniciada correctamente')
 
-        const payload = { sub: user.id, username: user.username, name: user.name, verify: user.isVerified };
+        const payload = { sub: user.id, username: user.username, name: user.name, verify: user.isVerified, role: user.role.name};
     
         return {
           access_token: await this.jwtService.signAsync(payload),

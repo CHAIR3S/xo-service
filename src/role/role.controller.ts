@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } 
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { Roles } from 'src/decorator/role.decorator';
+import { Role } from 'src/enum/role.enum';
 
 @Controller('role')
 export class RoleController {
@@ -12,11 +14,13 @@ export class RoleController {
   //   return this.roleService.create(createRoleDto);
   // }
 
+  @Roles(Role.ADMIN)
   @Get()
   findAll() {
     return this.roleService.findAll();
   }
 
+  @Roles(Role.ADMIN)
   @Get(':id')
   findOne(@Param('id') id: string) {
     const role = this.roleService.findOne(+id);

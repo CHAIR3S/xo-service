@@ -15,16 +15,14 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/auth.guard';
 import { RolesGuard } from './role/role.guard';
 import { SeedModule } from 'src/seeds/seed.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     RoleModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      url: 'postgresql://postgres:TSkabUlFpQxBEngQMuMyvgUjAwZsRXbb@junction.proxy.rlwy.net:42144/railway',
-      ssl: {
-        rejectUnauthorized: false, 
-      },
+      url: 'postgres://xo-root:f2HpBd9HTqFm4xy9GPhfnNexS0j2eO50AvrItNSaaW0QINhgfMsCDnFdVW05LkDT@82.180.137.186:5432/xo-db',
       entities: [__dirname + '/**/*.entity{.ts,.js}'], 
       synchronize: true, 
     }),

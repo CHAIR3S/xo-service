@@ -6,6 +6,7 @@ import { Roles } from 'src/decorator/role.decorator';
 import { Role } from 'src/enum/role.enum';
 import { Ticket } from './entities/ticket.entity';
 import { Public } from 'src/decorator/public.decorator';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('ticket')
 export class TicketController {
@@ -16,6 +17,7 @@ export class TicketController {
 
   //
   @Patch('code')
+  @ApiBody({ type: UpdateTicketDto })
   updateByCode(@Body() updateTicketDto: UpdateTicketDto) {
     this.logger.log(updateTicketDto)
     return this.ticketService.updateByCode(updateTicketDto);
@@ -23,12 +25,14 @@ export class TicketController {
 
   @Roles(Role.ADMIN, Role.CREATOR)
   @Post()
+  @ApiBody({ type: CreateTicketDto })
   create(@Body() createTicketDto: CreateTicketDto) {
     return this.ticketService.create(createTicketDto);
   }
 
   @Roles(Role.ADMIN, Role.CREATOR, Role.USER)
   @Post('event/:amount')
+  @ApiBody({ type: CreateTicketDto })
   createByEvent(@Param('amount') amount: number, @Body() createTicketDto: CreateTicketDto) {
     return this.ticketService.createAll(createTicketDto, amount);
   }
@@ -43,6 +47,13 @@ export class TicketController {
 
   @Public()
   @Post('user')
+  @ApiBody({ schema: { 
+    type: 'object', 
+    properties: { 
+      userId: { type: 'number' }, 
+      eventId: { type: 'string' } 
+    } 
+  }})
   async getByUserId(@Body() {userId, eventId}) {
     return this.ticketService.getByUserId(userId, eventId);
   }
@@ -63,11 +74,15 @@ export class TicketController {
 
 
 
+  @Roles(Role.ADMIN, Role.CREATOR)
   @Patch(':id')
+  @ApiBody({ type: UpdateTicketDto })
   update(@Param('id') id: string, @Body() updateTicketDto: UpdateTicketDto) {
     return this.ticketService.update(+id, updateTicketDto);
   }
 
+  
+  @Roles(Role.ADMIN, Role.CREATOR)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.ticketService.remove(+id);

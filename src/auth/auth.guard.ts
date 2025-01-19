@@ -2,6 +2,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   Logger,
   UnauthorizedException,
@@ -13,6 +14,7 @@ import { IS_PUBLIC_KEY } from 'src/decorator/public.decorator';
 import { Reflector } from '@nestjs/core';
 import { log } from 'console';
 import { config } from 'config';
+import { VALIDATE_USER_ID_KEY } from 'src/decorator/validate-user.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -27,6 +29,7 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
 
     if(!config.authEnabled){
+      this.logger.debug('No authentication')
       return true;
     }
 
@@ -54,6 +57,45 @@ export class AuthGuard implements CanActivate {
       );
 
       request['user'] = payload;
+
+
+      const userIdFromToken = payload.sub; // ID del usuario autenticado
+      const userRole = payload.role; // Rol del usuario
+
+      // 3. Verificar si hay que validar el userId del request
+      const validateUserIdField = this.reflector.get<string>(
+        VALIDATE_USER_ID_KEY,
+        context.getHandler(),
+      );
+
+      if (validateUserIdField) {
+        // Extraer el userId desde el parámetro indicado en el decorador
+        const userIdFromRequest =
+          request.params[validateUserIdField] ||
+          request.body[validateUserIdField] ||
+          request.query[validateUserIdField];
+
+        if (!userIdFromRequest) {
+          throw new ForbiddenException(`Missing userId field: ${validateUserIdField}`);
+        }
+
+
+        this.logger.debug('userIdFromToken : {}', userIdFromToken)
+        this.logger.debug('userIdFromRequest : {}', userIdFromRequest)
+        this.logger.debug('userRole : {}', payload)
+
+
+        // 4. Permitir acceso solo si el userId coincide o si es admin
+        if (userRole !== 'ADMIN' && userIdFromToken != userIdFromRequest) {
+          this.logger.warn(`Unauthorized access attempt: User ${userIdFromToken} tried to access ${userIdFromRequest}`);
+          throw new ForbiddenException('You are not allowed to access this resource');
+        }
+      }
+      
+      this.logger.log('AUTHGUARD >>>')
+      // this.logger.log(request['user'])
+
+      return true;
       
     } catch(e) {
       this.logger.log(token)
@@ -63,10 +105,6 @@ export class AuthGuard implements CanActivate {
     }
 
 
-    this.logger.log('AUTHGUARD >>>')
-    // this.logger.log(request['user'])
-
-    return true;
   }
 
   

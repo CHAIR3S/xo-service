@@ -5,13 +5,14 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { Public } from 'src/decorator/public.decorator';
 import { Roles } from 'src/decorator/role.decorator';
 import { Role } from 'src/enum/role.enum';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('event')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
-  // @Roles(Role.ADMIN, Role.CREATOR, Role)
-  @Public()
+  @Roles(Role.ADMIN, Role.CREATOR, Role.USER)
+  @ApiBody({ type: CreateEventDto })
   @Post()
   create(@Body() createEventDto: CreateEventDto) {
     return this.eventService.create(createEventDto);
@@ -25,6 +26,13 @@ export class EventController {
 
   @Roles(Role.ADMIN, Role.CREATOR, Role.USER)
   @Post('event-user')
+  @ApiBody({ schema: { 
+    type: 'object', 
+    properties: { 
+      userId: { type: 'number' }, 
+      eventId: { type: 'string' } 
+    } 
+  }})
   findUserRelation(@Body() { userId, eventId }: { userId: number; eventId: string }) {
     return this.eventService.getRelationUser(userId, eventId);
   }
@@ -65,6 +73,7 @@ export class EventController {
 
   @Roles(Role.ADMIN, Role.CREATOR)
   @Patch(':id')
+  @ApiBody({ type: UpdateEventDto })
   update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
     return this.eventService.update(id, updateEventDto);
   }
